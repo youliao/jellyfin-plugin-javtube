@@ -39,9 +39,11 @@ public class MovieProvider : BaseProvider, IRemoteMetadataProvider<Movie, MovieI
         var pid = info.GetPid(Name);
         if (string.IsNullOrWhiteSpace(pid.Id) || string.IsNullOrWhiteSpace(pid.Provider))
         {
-            // Search movies and pick the first result.
-            var firstResult = (await GetSearchResults(info, cancellationToken)).FirstOrDefault();
-            if (firstResult != null) pid = firstResult.GetPid(Name);
+            // Search movies and pick the fanza last result.
+            var searchResults = (await GetSearchResults(info, cancellationToken));
+            var pickedResult = searchResults.Where(x => x.Name.StartsWith("[FANZA]")).LastOrDefault() ?? searchResults.FirstOrDefault();
+
+            if (pickedResult != null) pid = pickedResult.GetPid(Name);
         }
 
         Logger.Info("Get movie info: {0}", pid.ToString());
